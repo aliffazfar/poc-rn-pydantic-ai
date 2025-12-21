@@ -1,0 +1,16 @@
+{
+  "name": "poc-rn-pydantic-ai",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -n agent,metro -c blue,green \"pnpm run dev:agent\" \"pnpm run dev:mobile\"",
+    "dev:agent": "cd packages/agent && source .venv/bin/activate && cd src && uvicorn main:app --reload --host 0.0.0.0 --port 8000",
+    "dev:mobile": "cd apps/mobile && pnpm start",
+    "setup": "pnpm install && pnpm setup:agent",
+    "setup:agent": "cd packages/agent && uv venv && source .venv/bin/activate && uv sync",
+    "ios": "cd apps/mobile && pnpm ios",
+    "android": "cd apps/mobile && pnpm android"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  }
+}

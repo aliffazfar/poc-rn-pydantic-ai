@@ -1,0 +1,248 @@
+# General
+.DS_Store
+*.log
+node_modules/
+.idea/
+.vscode/
+
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+.env
+dist/
+build/
+*.egg-info/
+
+# React Native
+ios/Pods/
+android/app/build/
+android/.gradle/
+android/local.properties
+*.keystore
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.
+
+# Metro
+.metro-health-check*
+
+# React Native Debugger
+.rndebugger
+
+# React Native Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# React Native Coverage
+coverage/
+
+# React Native Temporary files
+*.tmp
+*.temp
+
+# React Native Build artifacts
+*.jsbundle
+*.map
+
+# React Native IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# React Native OS
+.DS_Store
+Thumbs.db
+
+# React Native Misc
+*.bak
+*.cache
+*.pid
+*.seed
+*.pid.lock
+
+# React Native Package manager
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# React Native Environment
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# React Native Test
+coverage/
+.nyc_output
+
+# React Native TypeScript
+*.tsbuildinfo
+
+# React Native Bundle
+*.jsbundle
+
+# React Native Android
+android/app/build
+android/.gradle
+android/local.properties
+android/*.iml
+android/.idea
+android/captures
+android/gradlew
+android/gradlew.bat
+android/gradle/wrapper/gradle-wrapper.jar
+android/gradle/wrapper/gradle-wrapper.properties
+
+# React Native iOS
+ios/Pods/
+ios/build/
+ios/*.pbxuser
+ios/*.mode1v3
+ios/*.mode2v3
+ios/*.perspectivev3
+ios/*.xcworkspace/
+ios/*.xcuserdata/
+ios/*.xcuserstate
+ios/DerivedData/
+ios/Archive/
+ios/*.ipa
+ios/*.dSYM.zip
+ios/*.dSYM
+ios/*.mobileprovision
+ios/*.orig.
+ios/Podfile.lock
+
+# React Native macOS
+macos/Pods/
+macos/build/
+macos/*.pbxuser
+macos/*.mode1v3
+macos/*.mode2v3
+macos/*.perspectivev3
+macos/*.xcworkspace/
+macos/*.xcuserdata/
+macos/*.xcuserstate
+macos/DerivedData/
+macos/Archive/
+macos/*.ipa
+macos/*.dSYM.zip
+macos/*.dSYM
+macos/*.mobileprovision
+macos/*.orig.
+macos/Podfile.lock
+
+# React Native Windows
+windows/*.suo
+windows/*.user
+windows/*.userosscache
+windows/*.sln.docstates
+windows/.vs/
+windows/x64/
+windows/x86/
+windows/ARM/
+windows/ARM64/
+windows/BundleArtifacts/
+windows/Packages/
+windows/AppPackages/
+windows/BundleArtifacts/
+windows/Package.StoreAssociation.xml
+windows/_pkginfo.txt
+windows/*.appx
+windows/*.appxbundle
+windows/*.appxupload
+
+# React Native Web
+web-build/
+
+# React Native Expo
+.expo/
+.expo-shared/
+
+# React Native Flipper
+ios/Flipper/
+android/Flipper/
+
+# React Native Detox
+detox/artifacts/
+detox/test-results/
+
+# React Native Jest
+jest/
+
+# React Native Storybook
+storybook-static/
+
+# React Native Bundle analyzer
+bundle-report.html
+
+# React Native Source maps
+*.map
+
+# React Native Hermes
+hermes/
+
+# React Native New Architecture
+android/app/build/generated/source/codegen/
+ios/build/generated/ios/
+
+# React Native Fabric
+android/app/build/intermediates/fabric/
+ios/DerivedData/
+
+# React Native TurboModules
+android/app/build/intermediates/turbomodules/
+ios/DerivedData/
+
+# React Native Codegen
+android/app/build/generated/source/codegen/
+ios/build/generated/ios/
+
+# React Native Flipper
+ios/Flipper/
+android/Flipper/
+
+# React Native Detox
+detox/artifacts/
+detox/test-results/
+
+# React Native Jest
+jest/
+
+# React Native Storybook
+storybook-static/
+
+# React Native Bundle analyzer
+bundle-report.html
+
+# React Native Source maps
+*.map
+
+# React Native Hermes
+hermes/
+
+# React Native New Architecture
+android/app/build/generated/source/codegen/
+ios/build/generated/ios/
+
+# React Native Fabric
+android/app/build/intermediates/fabric/
+ios/DerivedData/
+
+# React Native TurboModules
+android/app/build/intermediates/turbomodules/
+ios/DerivedData/
+
+# React Native Codegen
+android/app/build/generated/source/codegen/
+ios/build/generated/ios/
