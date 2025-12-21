@@ -25,9 +25,20 @@ class Settings(BaseSettings):
 
     # Rate Limiting
     RATE_LIMIT: str = "100/minute"
+    
+    # CORS Configuration
+    CORS_ALLOW_ORIGINS: list[str] = [
+        "http://localhost:8081",    # Metro bundler
+        "http://10.0.2.2:8081",     # Android emulator
+        "http://localhost:3000",    # Web dev
+        "*",                        # Allow all for POC - restrict in production
+    ]
+    CORS_ALLOW_CREDENTIALS: bool = True
+    CORS_ALLOW_METHODS: list[str] = ["*"]
+    CORS_ALLOW_HEADERS: list[str] = ["*"]
 
     model_config = SettingsConfigDict(
-        env_file=(".env", "../.env", "../../.env"),
+        env_file=(".env", "../.env", "../../../.env"),
         extra="ignore"
     )
 

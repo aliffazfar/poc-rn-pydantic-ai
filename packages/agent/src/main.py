@@ -1,6 +1,8 @@
 import logging
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Header
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from typing import Optional
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
@@ -9,6 +11,7 @@ from pydantic_ai.ag_ui import StateDeps
 # Local Imports
 from agent import create_agent
 from models.banking import BankingState
+from models.chat import ChatRequest, ChatResponse, ChatMessage, ToolCallResult
 from config.settings import settings
 from config.logging import setup_logging
 from guardrails.middleware import GuardrailMiddleware
@@ -30,10 +33,23 @@ limiter = Limiter(key_func=get_remote_address, default_limits=[settings.RATE_LIM
 # 3. Initialize Agent
 agent = create_agent()
 
-# 4. Create the base AgUI app
-app: FastAPI = agent.to_ag_ui(deps=StateDeps(BankingState()))
+# 4. Create the base FastAPI app
+app = FastAPI(title=settings.APP_NAME)
 
-# 5. Add Rate Limiting & Exception Handlers
+# 5. Create AgUI app for CopilotKit compatibility and mount it
+agui_app = agent.to_ag_ui(deps=StateDeps(BankingState()))
+app.mount("/agui", agui_app)
+
+# 5. Add CORS Middleware for React Native
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.CORS_ALLOW_ORIGINS,
+    allow_credentials=settings.CORS_ALLOW_CREDENTIALS,
+    allow_methods=settings.CORS_ALLOW_METHODS,
+    allow_headers=settings.CORS_ALLOW_HEADERS,
+)
+
+# 6. Add Rate Limiting & Exception Handlers
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, custom_rate_limit_exceeded_handler)
 
@@ -45,8 +61,86 @@ async def global_exception_handler(request: Request, exc: Exception):
         content={"detail": "An internal server error occurred."}
     )
 
-# 6. Add Guardrail Middleware (clean and reusable)
+# 7. Add Guardrail Middleware
 app.add_middleware(GuardrailMiddleware)
+
+
+# ============================================================
+# NEW: Vercel AI SDK Compatible Endpoint for React Native
+# ============================================================
+
+@app.post("/api/chat")
+async def vercel_ai_chat(
+    request: ChatRequest,
+    x_platform: Optional[str] = Header(default="web")
+):
+    """
+    Vercel AI SDK compatible endpoint for React Native.
+    Returns non-streaming JSON response with tool call metadata.
+
+    This allows React Native apps using react-native-vercel-ai
+    to communicate with the same PydanticAI agent.
+    """
+    logger.info(f"📱 /api/chat request from platform: {x_platform}")
+
+    # Extract user message
+    user_input = ""
+    if request.messages:
+        user_input = request.messages[-1].content
+        logger.debug(f"   └─ User: {user_input[:50]}...")
+
+    # Initialize state - in production, load from session/database
+    state = BankingState()
+
+    # Run the SAME agent used by CopilotKit
+    result = await agent.run(user_input, deps=StateDeps(state))
+
+    # Extract tool calls for Generative UI
+    tool_calls = extract_tool_calls(result)
+
+    logger.info(f"   └─ Tool calls: {len(tool_calls)}, Status: {state.status}")
+
+    return ChatResponse(
+        message=ChatMessage(
+            role="assistant",
+            content=str(result.data)
+        ),
+        tool_calls=tool_calls,
+        state=state.model_dump()
+    )
+
+
+def extract_tool_calls(result) -> list[ToolCallResult]:
+    """
+    Extract tool call information from PydanticAI result.
+    This enables Generative UI on the React Native side.
+    """
+    tool_calls = []
+
+    try:
+        if hasattr(result, 'all_messages'):
+            for msg in result.all_messages():
+                if hasattr(msg, 'parts'):
+                    for part in msg.parts:
+                        if hasattr(part, 'tool_name'):
+                            args = {}
+                            if hasattr(part, 'args'):
+                                args = part.args if isinstance(part.args, dict) else {}
+                            tool_calls.append(ToolCallResult(
+                                tool_name=part.tool_name,
+                                args=args,
+                                status="complete"
+                            ))
+    except Exception as e:
+        logger.error(f"Failed to extract tool calls: {e}")
+
+    return tool_calls
+
+
+# Health check endpoint
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy", "app": settings.APP_NAME}
 
 if __name__ == "__main__":
     import uvicorn
