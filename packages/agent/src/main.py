@@ -1,5 +1,6 @@
 import logging
 import json
+from uuid import uuid4
 from fastapi import FastAPI, Request, Header
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -20,6 +21,10 @@ from guardrails.middleware import GuardrailMiddleware
 # 1. Setup Logging
 setup_logging()
 logger = logging.getLogger("jom_kira.main")
+
+# In-memory session store for POC
+# Key: session_id, Value: BankingState
+session_store: dict[str, BankingState] = {}
 
 
 # Custom Rate Limit Handler
@@ -73,7 +78,8 @@ app.add_middleware(GuardrailMiddleware)
 @app.post("/api/chat")
 async def vercel_ai_chat(
     request: ChatRequest,
-    x_platform: Optional[str] = Header(default="web")
+    x_platform: Optional[str] = Header(default="web"),
+    x_session_id: Optional[str] = Header(default=None)
 ):
     """
     Vercel AI SDK compatible endpoint for React Native.
@@ -82,16 +88,39 @@ async def vercel_ai_chat(
     This allows React Native apps using react-native-vercel-ai
     to communicate with the same PydanticAI agent.
     """
-    logger.info(f"📱 /api/chat request from platform: {x_platform}")
+    logger.info(f"📱 /api/chat request from platform: {x_platform}, session: {x_session_id}")
+
+    # Get or create session
+    session_id = x_session_id or str(uuid4())
+    
+    if session_id in session_store:
+        state = session_store[session_id]
+        logger.info(f"📦 Loaded existing session: {session_id[:8]}...")
+    else:
+        # Create new state with initial balance if provided
+        initial_balance = request.initial_balance if request.initial_balance is not None else 1000.0
+        state = BankingState(balance=initial_balance)
+        session_store[session_id] = state
+        logger.info(f"🆕 Created new session: {session_id[:8]}... with balance RM {initial_balance}")
+
+    # Handle silent initialization
+    if request.is_init:
+        logger.info(f"🤫 Silent initialization for session: {session_id[:8]}...")
+        return ChatResponse(
+            message=ChatMessage(
+                role="assistant",
+                content="INIT_OK"
+            ),
+            tool_calls=[],
+            state=state.model_dump(),
+            session_id=session_id
+        )
 
     # Extract user message
     user_input = ""
     if request.messages:
         user_input = request.messages[-1].content
         logger.debug(f"   └─ User: {user_input[:50]}...")
-
-    # Initialize state - in production, load from session/database
-    state = BankingState()
 
     # Run the SAME agent used by CopilotKit
     result = await agent.run(user_input, deps=StateDeps(state))
@@ -107,7 +136,8 @@ async def vercel_ai_chat(
             content=str(result.output)
         ),
         tool_calls=tool_calls,
-        state=state.model_dump()
+        state=state.model_dump(),
+        session_id=session_id
     )
 
 

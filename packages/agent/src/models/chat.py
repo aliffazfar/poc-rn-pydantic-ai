@@ -9,6 +9,8 @@ class ChatMessage(BaseModel):
 class ChatRequest(BaseModel):
     """Request format from react-native-vercel-ai."""
     messages: List[ChatMessage]
+    initial_balance: Optional[float] = None
+    is_init: bool = False
 
 class ToolCallResult(BaseModel):
     """Tool call metadata for Generative UI."""
@@ -21,3 +23,4 @@ class ChatResponse(BaseModel):
     message: ChatMessage
     tool_calls: List[ToolCallResult] = []
     state: dict = {}
+    session_id: str = ""
