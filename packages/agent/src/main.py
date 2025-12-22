@@ -103,7 +103,7 @@ async def vercel_ai_chat(
     return ChatResponse(
         message=ChatMessage(
             role="assistant",
-            content=str(result.data)
+            content=str(result.output)
         ),
         tool_calls=tool_calls,
         state=state.model_dump()
