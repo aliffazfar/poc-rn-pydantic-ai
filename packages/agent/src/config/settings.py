@@ -19,8 +19,8 @@ class Settings(BaseSettings):
     
     # App Settings
     APP_NAME: str = "JomKira"
-    DEBUG: bool = False
-    LOG_LEVEL: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = "INFO"
+    DEBUG: bool = True
+    LOG_LEVEL: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = "DEBUG"
     LOG_FORMAT: Literal["text", "json"] = "text"
 
     # Rate Limiting

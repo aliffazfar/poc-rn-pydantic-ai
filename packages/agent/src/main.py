@@ -1,4 +1,5 @@
 import logging
+import json
 from fastapi import FastAPI, Request, Header
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -120,19 +121,45 @@ def extract_tool_calls(result) -> list[ToolCallResult]:
     try:
         if hasattr(result, 'all_messages'):
             for msg in result.all_messages():
+                logger.debug(f"   📨 Message type: {type(msg).__name__}")
                 if hasattr(msg, 'parts'):
                     for part in msg.parts:
-                        if hasattr(part, 'tool_name'):
+                        logger.debug(f"      └─ Part: {type(part).__name__}, part_kind={getattr(part, 'part_kind', 'N/A')}")
+                        # Check for part_kind == 'tool-call' to avoid ToolReturnPart
+                        if hasattr(part, 'part_kind') and part.part_kind == 'tool-call':
                             args = {}
                             if hasattr(part, 'args'):
-                                args = part.args if isinstance(part.args, dict) else {}
+                                raw_args = part.args
+                                logger.debug(f"         └─ Args type: {type(raw_args).__name__}, value: {raw_args}")
+                                # Handle different arg types: str (JSON), dict, ArgsDict, Pydantic model
+                                if isinstance(raw_args, str):
+                                    # JSON string - parse it
+                                    try:
+                                        args = json.loads(raw_args)
+                                    except json.JSONDecodeError:
+                                        args = {}
+                                elif isinstance(raw_args, dict):
+                                    args = raw_args
+                                elif hasattr(raw_args, 'model_dump'):
+                                    # Pydantic model
+                                    args = raw_args.model_dump()
+                                elif hasattr(raw_args, 'args_dict'):
+                                    # ArgsDict type
+                                    args = dict(raw_args.args_dict)
+                                else:
+                                    # Try to convert to dict
+                                    try:
+                                        args = dict(raw_args)
+                                    except (TypeError, ValueError):
+                                        args = {}
                             tool_calls.append(ToolCallResult(
                                 tool_name=part.tool_name,
                                 args=args,
                                 status="complete"
                             ))
+                            logger.debug(f"         ✅ Extracted: {part.tool_name} with args: {args}")
     except Exception as e:
-        logger.error(f"Failed to extract tool calls: {e}")
+        logger.error(f"Failed to extract tool calls: {e}", exc_info=True)
 
     return tool_calls
 
