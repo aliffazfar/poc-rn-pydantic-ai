@@ -1,8 +1,9 @@
-import React, {useRef} from 'react';
-import {View, Text, TouchableOpacity, ScrollView} from 'react-native';
-import {ChevronRight} from 'lucide-react-native';
-import {PromoItem} from '../../lib/types';
-import {uiLog} from '../../lib/logger';
+import React, { useRef } from 'react';
+import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { ChevronRight } from 'lucide-react-native';
+import { PromoItem } from '../../lib/types';
+import { uiLog } from '../../lib/logger';
+import { colors } from '../../themes/colors';
 
 const CARD_WIDTH = 160;
 
@@ -63,10 +64,10 @@ export function PromoCard({
       {/* Bottom: Action Button */}
       {actionText && (
         <View className="flex-row items-center gap-0.5">
-          <Text className="text-[11px] font-semibold tracking-wider text-[#4460e9]">
+          <Text className="text-primary text-[11px] font-semibold tracking-wider">
             {actionText}
           </Text>
-          <ChevronRight size={14} color={'#4460e9'} strokeWidth={3} />
+          <ChevronRight size={14} color={colors.primary} strokeWidth={3} />
         </View>
       )}
     </TouchableOpacity>
@@ -77,7 +78,7 @@ interface PromoCardsContainerProps {
   children: React.ReactNode;
 }
 
-export function PromoCardsContainer({children}: PromoCardsContainerProps) {
+export function PromoCardsContainer({ children }: PromoCardsContainerProps) {
   const scrollRef = useRef<ScrollView>(null);
 
   return (
@@ -85,9 +86,10 @@ export function PromoCardsContainer({children}: PromoCardsContainerProps) {
       ref={scrollRef}
       horizontal
       showsHorizontalScrollIndicator={false}
-      contentContainerStyle={{paddingHorizontal: 16, paddingLeft: 8}}
+      contentContainerStyle={{ paddingHorizontal: 16, paddingLeft: 8 }}
       snapToInterval={CARD_WIDTH + 14}
-      decelerationRate="fast">
+      decelerationRate="fast"
+    >
       {children}
     </ScrollView>
   );

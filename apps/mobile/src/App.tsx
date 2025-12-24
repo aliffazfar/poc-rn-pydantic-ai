@@ -1,19 +1,10 @@
-import React, {useRef} from 'react';
-import {View, StatusBar} from 'react-native';
-import {SafeAreaProvider, useSafeAreaInsets} from 'react-native-safe-area-context';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import React, { useRef } from 'react';
+import { View, StatusBar } from 'react-native';
 import {
-  Scan,
-  Plus,
-  ArrowDownLeft,
-  ArrowUpRight,
-  Wallet,
-  PiggyBank,
-  Sparkles,
-  TrendingUp,
-  ShieldCheck,
-  Landmark,
-} from 'lucide-react-native';
+  SafeAreaProvider,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import Animated, {
   useSharedValue,
@@ -45,15 +36,14 @@ import type { DashboardContentSheetRef } from './components';
 import { useChatAnimation, useJomKiraChat, useToolCallActions } from './hooks';
 
 // Types and Utils
-import {
-  BankingState,
-  PromoItem,
-  AccountItem,
-  ActionButtonItem,
-  ToolCall,
-} from './lib/types';
 import { logger } from './lib/logger';
-import { colors } from './themes/colors';
+import { DEFAULT_INITIAL_BALANCE } from './lib/constants';
+import {
+  DASHBOARD_ACTIONS,
+  PROMO_DATA,
+  createMockAccounts,
+} from './lib/mockData';
+import { BankingState, ToolCall } from './lib/types';
 
 function AppContent() {
   const insets = useSafeAreaInsets();
@@ -106,7 +96,6 @@ function AppContent() {
     [progress]
   );
 
-  // Chat state management
   const {
     messages,
     toolCalls,
@@ -115,9 +104,8 @@ function AppContent() {
     bankingState,
     sendMessage,
     initSession,
-    clearChat,
   } = useJomKiraChat({
-    initialBalance: 50.43,
+    initialBalance: DEFAULT_INITIAL_BALANCE,
     onError: (error) => logger.error('Chat error', error),
   });
 
@@ -129,36 +117,25 @@ function AppContent() {
     handleBillPaymentDecline,
   } = useToolCallActions({ sendMessage });
 
-  // Handle "Ask AI" click from dashboard header - collapse sheet to peek
   const handleAskAIClick = () => {
     logger.info('Chat opened via Ask AI');
-    // Mark as programmatic to avoid double-triggering in handleSnapChange
     isProgrammaticAnimation.current = true;
-    // Trigger header animation immediately for snappier feel
     animateToChat();
-    // Then animate sheet
     sheetRef.current?.peek();
 
-    // Initialize session if needed
     if (!sessionId && messages.length === 0) {
       initSession();
     }
   };
 
-  // Handle close chat from chat header - expand sheet back to full
   const handleCloseChat = () => {
     logger.info('Chat closed');
-    // Mark as programmatic to avoid double-triggering in handleSnapChange
     isProgrammaticAnimation.current = true;
-    // Trigger header animation immediately for snappier feel
     animateToDashboard();
-    // Then animate sheet
     sheetRef.current?.expand();
   };
 
-  // Handle sheet snap changes - only trigger for drag-based changes (not programmatic)
   const handleSnapChange = (index: number) => {
-    // Skip if this was triggered by a programmatic animation
     if (isProgrammaticAnimation.current) {
       isProgrammaticAnimation.current = false;
       logger.info(
@@ -167,7 +144,6 @@ function AppContent() {
       return;
     }
 
-    // This is a drag-based change (user dragged via chevron)
     if (index === 0) {
       logger.info('Sheet dragged to peek - chat visible');
       animateToChat();
@@ -184,101 +160,33 @@ function AppContent() {
     }
   };
 
-  const renderToolCalls = (
-    calls: ToolCall[] = toolCalls,
-    state: BankingState = bankingState
-  ) => (
-    <ToolCallRenderer
-      toolCalls={calls}
-      bankingState={state}
-      onTransferApprove={handleTransferApprove}
-      onTransferDecline={handleTransferDecline}
-      onTransferEdit={handleTransferEdit}
-      onBillPaymentApprove={handleBillPaymentApprove}
-      onBillPaymentDecline={handleBillPaymentDecline}
-    />
-  );
+  const renderToolCalls = (calls?: ToolCall[], state?: BankingState) => {
+    const activeCalls = calls || toolCalls;
+    const activeState = state || bankingState;
 
-  // Dashboard data
-  const DASHBOARD_ACTIONS: ActionButtonItem[] = [
-    { label: 'Scan', Icon: Scan, id: 'scan' },
-    { label: 'Add money', Icon: Plus, id: 'add_money' },
-    { label: 'Receive', Icon: ArrowDownLeft, id: 'receive' },
-    { label: 'Transfer', Icon: ArrowUpRight, id: 'transfer' },
-  ];
+    logger.debug('Rendering tool calls:', {
+      hasProvidedCalls: !!calls,
+      providedCount: calls?.length,
+      globalCount: toolCalls.length,
+      renderingCount: activeCalls.length,
+    });
 
-  const MOCK_ACCOUNTS: AccountItem[] = [
-    {
-      id: 'main',
-      name: 'Main Account',
-      amount: bankingState.balance,
-      badge: '3.00% p.a.',
-      iconBgColor: colors.primaryDark,
-      Icon: Wallet,
-    },
-    {
-      id: 'pocket',
-      name: 'Jom Pocket',
-      subtitle: 'Save Pocket',
-      amount: 0.0,
-      badge: '3.00% p.a.',
-      iconBgColor: '#2DD4BF', // teal-400
-      Icon: PiggyBank,
-    },
-  ];
+    if (activeCalls.length === 0) {
+      return null;
+    }
 
-  const PROMO_DATA: PromoItem[] = [
-    {
-      id: 'paylater',
-      title: 'JomKira PayLater',
-      description: 'Get credit limit up to RM 1,499',
-      icon: <Sparkles size={20} color="#006064" />,
-      bgColor: '#b6faf6',
-      textColor: '#008d89',
-      subTextColor: '#000000',
-      actionText: 'Apply now',
-    },
-    {
-      id: 'jomkira-ai',
-      title: 'JomKira AI',
-      description: 'Get RM 5 cashback!',
-      icon: <Sparkles size={20} color="#c100c7" />,
-      bgColor: '#ffdbff',
-      textColor: '#c100c7',
-      subTextColor: '#000000',
-      actionText: 'Learn more',
-    },
-    {
-      id: 'savings',
-      title: 'Smart Savings',
-      description: 'Earn 4.2% p.a. interest today',
-      icon: <TrendingUp size={20} color="#2E7D32" />,
-      bgColor: '#E8F5E9',
-      textColor: '#2E7D32',
-      subTextColor: '#388E3C',
-      actionText: 'Save now',
-    },
-    {
-      id: 'security',
-      title: 'Card Security',
-      description: 'New: Instant card lock feature',
-      icon: <ShieldCheck size={20} color="#E65100" />,
-      bgColor: '#FFF3E0',
-      textColor: '#E65100',
-      subTextColor: '#EF6C00',
-      actionText: 'Secure now',
-    },
-    {
-      id: 'fd',
-      title: 'Fixed Deposit',
-      description: 'Higher returns for your wealth',
-      icon: <Landmark size={20} color="#1A237E" />,
-      bgColor: '#E8EAF6',
-      textColor: '#1A237E',
-      subTextColor: '#283593',
-      actionText: 'Invest now',
-    },
-  ];
+    return (
+      <ToolCallRenderer
+        toolCalls={activeCalls}
+        bankingState={activeState}
+        onTransferApprove={handleTransferApprove}
+        onTransferDecline={handleTransferDecline}
+        onTransferEdit={handleTransferEdit}
+        onBillPaymentApprove={handleBillPaymentApprove}
+        onBillPaymentDecline={handleBillPaymentDecline}
+      />
+    );
+  };
 
   return (
     <View className="flex-1">
@@ -347,7 +255,7 @@ function AppContent() {
         {/* Accounts Section */}
         <AccountsSection
           title="Accounts"
-          accounts={MOCK_ACCOUNTS}
+          accounts={createMockAccounts(bankingState.balance)}
           onAccountClick={(account) =>
             logger.info(`Account clicked: ${account.id}`)
           }
@@ -360,7 +268,7 @@ function AppContent() {
 // Main App component wraps AppContent with providers
 export default function App() {
   return (
-    <GestureHandlerRootView className='flex flex-1'>
+    <GestureHandlerRootView className="flex flex-1">
       <KeyboardProvider>
         <SafeAreaProvider>
           <AppContent />

@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {View, Text, TouchableOpacity} from 'react-native';
-import {ChevronDown, Eye, EyeOff} from 'lucide-react-native';
+import { Eye, EyeOff } from 'lucide-react-native';
 import {ActionButton} from './ActionButton';
 import {CURRENCY} from '../../lib/constants';
 import {ActionButtonItem} from '../../lib/types';

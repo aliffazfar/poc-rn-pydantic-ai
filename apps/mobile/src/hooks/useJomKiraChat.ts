@@ -1,6 +1,10 @@
 import { useState } from 'react';
 import { ChatMessage, ToolCall, BankingState } from '../lib/types';
-import { API_BASE_URL } from '../lib/constants';
+import {
+  API_BASE_URL,
+  AI_GREETING,
+  DEFAULT_INITIAL_BALANCE,
+} from '../lib/constants';
 import { logger } from '../lib/logger';
 
 interface UseJomKiraChatOptions {
@@ -9,7 +13,7 @@ interface UseJomKiraChatOptions {
 }
 
 export function useJomKiraChat({
-  initialBalance = 50.43,
+  initialBalance = DEFAULT_INITIAL_BALANCE,
   onError,
 }: UseJomKiraChatOptions = {}) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -61,6 +65,11 @@ export function useJomKiraChat({
       }
 
       const data = await response.json();
+      logger.info('📱 Received chat response', {
+        hasMessage: !!data.message,
+        toolCallsCount: data.tool_calls?.length || 0,
+        hasState: !!data.state,
+      });
 
       // Store session ID
       if (data.session_id) {
@@ -94,13 +103,12 @@ export function useJomKiraChat({
   }
 
   async function initSession() {
-    // Immediately show hardcoded greeting if it's the first initialization
+    // Immediately show AI greeting if it's the first initialization
     if (!sessionId && messages.length === 0) {
       const greeting: ChatMessage = {
         id: 'greeting',
         role: 'assistant',
-        content:
-          "Hello! I'm JomKira AI. How can I assist you today? I can help you with bank transfers, bill payments, or balance inquiries.",
+        content: AI_GREETING,
       };
       setMessages([greeting]);
     }

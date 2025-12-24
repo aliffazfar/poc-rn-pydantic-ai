@@ -1,5 +1,5 @@
-import React, {useState, useRef} from 'react';
-import {View, Text, TextInput, TouchableOpacity, Image} from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, Text, TextInput, TouchableOpacity, Image } from 'react-native';
 import {
   Plus,
   ImageIcon,
@@ -18,21 +18,17 @@ import Animated, {
   interpolate,
   SharedValue,
 } from 'react-native-reanimated';
-import {colors} from '../../themes/colors';
-import {uiLog} from '../../lib/logger';
+import { colors } from '../../themes/colors';
+import { uiLog } from '../../lib/logger';
 
 interface ChatInputProps {
   inProgress: boolean;
-  onSend: (text: string, image?: {format: string; bytes: string}) => void;
+  onSend: (text: string, image?: { format: string; bytes: string }) => void;
   keyboardProgress: SharedValue<number>;
   bottomInset: number;
 }
 
-const PROMO_BANNER_HEIGHT = 48; // Slimmer banner like Ryt app
-
-// Dark blue glassmorphic colors matching Ryt app
-const GLASS_BG = 'rgba(25, 30, 55, 0.85)'; // Dark navy with transparency
-const GLASS_BORDER = 'rgba(255, 255, 255, 0.12)'; // Subtle white border
+const PROMO_BANNER_HEIGHT = 48;
 
 export function ChatInput({
   inProgress,
@@ -119,18 +115,9 @@ export function ChatInput({
 
   return (
     <Animated.View style={containerStyle} className="shrink-0 px-4 pt-2">
-      {/* Promo Banner - slimmer dark glassmorphic style like Ryt app */}
       <Animated.View
-        style={[
-          promoBannerStyle,
-          {
-            overflow: 'hidden',
-            backgroundColor: GLASS_BG,
-            borderColor: GLASS_BORDER,
-            borderWidth: 1,
-          },
-        ]}
-        className="flex-row items-center gap-3 rounded-xl px-3"
+        style={[promoBannerStyle, { overflow: 'hidden' }]}
+        className="bg-glass-bg border-glass-border flex-row items-center gap-3 rounded-xl border px-3"
       >
         <View
           className="h-6 w-6 items-center justify-center rounded-full"
@@ -139,23 +126,16 @@ export function ChatInput({
           <Wallet size={14} color={colors.textInverse} />
         </View>
         <View className="flex-1">
-          <Text className="text-[11px] font-semibold text-white">
+          <Text className="text-text-inverse text-[11px] font-semibold">
             Snap and pay with JomKira AI, get up to RM 5
           </Text>
         </View>
-        <Text className="text-white">›</Text>
+        <Text className="text-text-inverse">›</Text>
       </Animated.View>
 
       {/* Input Area - dark glassmorphic style */}
       <View>
-        <View
-          className="flex-row items-center gap-2 rounded-xl px-4 py-3"
-          style={{
-            backgroundColor: GLASS_BG,
-            borderColor: GLASS_BORDER,
-            borderWidth: 1,
-          }}
-        >
+        <View className="bg-glass-bg border-glass-border flex-row items-center gap-2 rounded-xl border px-4 py-3">
           <TextInput
             ref={inputRef}
             value={inputValue}
@@ -163,8 +143,7 @@ export function ChatInput({
             editable={!inProgress}
             placeholder="Ask JomKira AI"
             placeholderTextColor="rgba(255, 255, 255, 0.4)"
-            className="flex-1 text-[14px] font-medium"
-            style={{ color: 'rgba(255, 255, 255, 0.9)' }}
+            className="text-text-inverse flex-1 text-[14px] font-medium"
             onSubmitEditing={handleSubmit}
             returnKeyType="send"
           />
@@ -192,16 +171,16 @@ export function ChatInput({
         <View className="mt-3 flex-row items-center justify-between px-1">
           <View className="flex-row items-center gap-5">
             <TouchableOpacity>
-              <Plus size={20} color="white" />
+              <Plus size={20} color={colors.textInverse} />
             </TouchableOpacity>
             <TouchableOpacity onPress={handleImageSelect}>
-              <ImageIcon size={20} color="white" />
+              <ImageIcon size={20} color={colors.textInverse} />
             </TouchableOpacity>
             <TouchableOpacity>
-              <AtSign size={20} color="white" />
+              <AtSign size={20} color={colors.textInverse} />
             </TouchableOpacity>
             <TouchableOpacity>
-              <Sparkles size={20} color="white" />
+              <Sparkles size={20} color={colors.textInverse} />
             </TouchableOpacity>
           </View>
 
@@ -228,4 +207,3 @@ export function ChatInput({
     </Animated.View>
   );
 }
-

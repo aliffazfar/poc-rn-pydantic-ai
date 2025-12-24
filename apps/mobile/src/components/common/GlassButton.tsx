@@ -49,7 +49,6 @@ interface GlassButtonProps {
  * Creates a frosted glass appearance by blurring the content behind
  * the button and overlaying a semi-transparent background.
  *
- * Based on the reference design from the Ryt banking app screenshots.
  */
 export function GlassButton({
   width,

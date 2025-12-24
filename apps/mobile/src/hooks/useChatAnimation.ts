@@ -1,4 +1,5 @@
-import {useState} from 'react';
+import { useState, useEffect } from 'react';
+import { logger } from '../lib/logger';
 import {
   useSharedValue,
   useAnimatedStyle,
@@ -7,7 +8,7 @@ import {
   AnimatedStyle,
   Extrapolation,
 } from 'react-native-reanimated';
-import {ViewStyle} from 'react-native';
+import { ViewStyle } from 'react-native';
 
 interface UseChatAnimationProps {
   topInset: number;
@@ -30,7 +31,6 @@ interface UseChatAnimationReturn {
 export function useChatAnimation({
   topInset: _topInset,
 }: UseChatAnimationProps): UseChatAnimationReturn {
-
   const [isChatMode, setIsChatMode] = useState(false);
   const [isChatContentVisible, setIsChatContentVisible] = useState(false);
 
@@ -38,18 +38,22 @@ export function useChatAnimation({
   // Progress 0 = dashboard mode (sheet expanded), Progress 1 = chat mode (sheet peeked)
   const progress = useSharedValue(0);
 
-  // Animate header to chat mode (called when programmatically opening chat)
+  // Effect to log animation state changes for POC
+  useEffect(() => {
+    logger.debug(
+      `[useChatAnimation] Chat mode: ${isChatMode}, Content visible: ${isChatContentVisible}`
+    );
+  }, [isChatMode, isChatContentVisible]);
+
   const animateToChat = () => {
+    logger.info('[useChatAnimation] Transitioning to Chat mode');
     setIsChatMode(true);
-    setIsChatContentVisible(true); // Show content immediately on open
-    // Note: Progress will be driven by sheet's animatedIndex via useAnimatedReaction in App.tsx
+    setIsChatContentVisible(true);
   };
 
-  // Animate header to dashboard mode (called when programmatically closing chat)
   const animateToDashboard = () => {
+    logger.info('[useChatAnimation] Transitioning to Dashboard mode');
     setIsChatMode(false);
-    // Note: Progress will be driven by sheet's animatedIndex via useAnimatedReaction in App.tsx
-    // We'll hide content when sheet settles via onSnapChange callback.
   };
 
   // Avatar -> Close X animation (smooth fade in/out)
@@ -57,9 +61,21 @@ export function useChatAnimation({
   const avatarStyle = useAnimatedStyle(() => {
     'worklet';
     return {
-      opacity: interpolate(progress.value, [0, 0.4], [1, 0], Extrapolation.CLAMP),
+      opacity: interpolate(
+        progress.value,
+        [0, 0.4],
+        [1, 0],
+        Extrapolation.CLAMP
+      ),
       transform: [
-        {translateY: interpolate(progress.value, [0, 0.4], [0, -4], Extrapolation.CLAMP)},
+        {
+          translateY: interpolate(
+            progress.value,
+            [0, 0.4],
+            [0, -4],
+            Extrapolation.CLAMP
+          ),
+        },
       ],
     };
   });
@@ -67,9 +83,21 @@ export function useChatAnimation({
   const closeStyle = useAnimatedStyle(() => {
     'worklet';
     return {
-      opacity: interpolate(progress.value, [0.3, 0.7], [0, 1], Extrapolation.CLAMP),
+      opacity: interpolate(
+        progress.value,
+        [0.3, 0.7],
+        [0, 1],
+        Extrapolation.CLAMP
+      ),
       transform: [
-        {translateY: interpolate(progress.value, [0.3, 0.7], [4, 0], Extrapolation.CLAMP)},
+        {
+          translateY: interpolate(
+            progress.value,
+            [0.3, 0.7],
+            [4, 0],
+            Extrapolation.CLAMP
+          ),
+        },
       ],
     };
   });
@@ -78,9 +106,21 @@ export function useChatAnimation({
   const pillStyle = useAnimatedStyle(() => {
     'worklet';
     return {
-      opacity: interpolate(progress.value, [0, 0.4], [1, 0], Extrapolation.CLAMP),
+      opacity: interpolate(
+        progress.value,
+        [0, 0.4],
+        [1, 0],
+        Extrapolation.CLAMP
+      ),
       transform: [
-        {translateY: interpolate(progress.value, [0, 0.4], [0, -2], Extrapolation.CLAMP)},
+        {
+          translateY: interpolate(
+            progress.value,
+            [0, 0.4],
+            [0, -2],
+            Extrapolation.CLAMP
+          ),
+        },
       ],
     };
   });
@@ -88,9 +128,21 @@ export function useChatAnimation({
   const titleStyle = useAnimatedStyle(() => {
     'worklet';
     return {
-      opacity: interpolate(progress.value, [0.3, 0.7], [0, 1], Extrapolation.CLAMP),
+      opacity: interpolate(
+        progress.value,
+        [0.3, 0.7],
+        [0, 1],
+        Extrapolation.CLAMP
+      ),
       transform: [
-        {translateY: interpolate(progress.value, [0.3, 0.7], [2, 0], Extrapolation.CLAMP)},
+        {
+          translateY: interpolate(
+            progress.value,
+            [0.3, 0.7],
+            [2, 0],
+            Extrapolation.CLAMP
+          ),
+        },
       ],
     };
   });
@@ -99,9 +151,21 @@ export function useChatAnimation({
   const bellStyle = useAnimatedStyle(() => {
     'worklet';
     return {
-      opacity: interpolate(progress.value, [0, 0.4], [1, 0], Extrapolation.CLAMP),
+      opacity: interpolate(
+        progress.value,
+        [0, 0.4],
+        [1, 0],
+        Extrapolation.CLAMP
+      ),
       transform: [
-        {translateY: interpolate(progress.value, [0, 0.4], [0, -2], Extrapolation.CLAMP)},
+        {
+          translateY: interpolate(
+            progress.value,
+            [0, 0.4],
+            [0, -2],
+            Extrapolation.CLAMP
+          ),
+        },
       ],
     };
   });
@@ -110,9 +174,21 @@ export function useChatAnimation({
   const chatContentStyle = useAnimatedStyle(() => {
     'worklet';
     return {
-      opacity: interpolate(progress.value, [0, 0.5], [0, 1], Extrapolation.CLAMP),
+      opacity: interpolate(
+        progress.value,
+        [0, 0.5],
+        [0, 1],
+        Extrapolation.CLAMP
+      ),
       transform: [
-        {translateY: interpolate(progress.value, [0, 0.5], [8, 0], Extrapolation.CLAMP)},
+        {
+          translateY: interpolate(
+            progress.value,
+            [0, 0.5],
+            [8, 0],
+            Extrapolation.CLAMP
+          ),
+        },
       ],
     };
   });

@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Text} from 'react-native';
+import { View, Text } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -7,8 +7,8 @@ import Animated, {
   withTiming,
   withDelay,
 } from 'react-native-reanimated';
-import {ChatMessage} from '../../lib/types';
-import {colors} from '../../themes/colors';
+import { ChatMessage } from '../../lib/types';
+import { colors } from '../../themes/colors';
 
 interface AssistantMessageProps {
   message?: ChatMessage;
@@ -16,23 +16,23 @@ interface AssistantMessageProps {
   subComponent?: React.ReactNode;
 }
 
-function LoadingDot({delay}: {delay: number}) {
+function LoadingDot({ delay }: { delay: number }) {
   const translateY = useSharedValue(0);
 
   React.useEffect(() => {
     translateY.value = withDelay(
       delay,
-      withRepeat(withTiming(-6, {duration: 400}), -1, true),
+      withRepeat(withTiming(-6, { duration: 400 }), -1, true)
     );
   }, [delay, translateY]);
 
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{translateY: translateY.value}],
+    transform: [{ translateY: translateY.value }],
   }));
 
   return (
     <Animated.View
-      style={[animatedStyle, {backgroundColor: colors.primaryAlpha70}]}
+      style={[animatedStyle, { backgroundColor: colors.primaryAlpha70 }]}
       className="h-2 w-2 rounded-full"
     />
   );
@@ -56,9 +56,9 @@ export function AssistantMessage({
       {/* Only render the bubble if there is content or loading */}
       {hasBubble && (
         <View className="items-start">
-          <View className=" max-w-[85%] rounded-2xl rounded-bl-sm  bg-[#292940]/40 px-3.5 py-2.5">
+          <View className="bg-glass-card max-w-[85%] rounded-2xl rounded-bl-sm px-3.5 py-2.5">
             {hasContent && (
-              <Text className="text-white text-[15px] font-medium leading-relaxed">
+              <Text className="text-text-inverse text-[15px] font-medium leading-relaxed">
                 {message?.content}
               </Text>
             )}

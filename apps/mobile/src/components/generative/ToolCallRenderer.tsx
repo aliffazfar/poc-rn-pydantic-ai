@@ -1,10 +1,10 @@
 import React from 'react';
-import {View, Text, ActivityIndicator} from 'react-native';
-import {Check} from 'lucide-react-native';
-import {InChatPaymentCard} from './InChatPaymentCard';
-import {BankingState, ToolCall} from '../../lib/types';
-import {colors} from '../../themes/colors';
-import {uiLog} from '../../lib/logger';
+import { View, Text, ActivityIndicator } from 'react-native';
+import { Check } from 'lucide-react-native';
+import { InChatPaymentCard } from './InChatPaymentCard';
+import { BankingState, ToolCall } from '../../lib/types';
+import { colors } from '../../themes/colors';
+import { uiLog } from '../../lib/logger';
 
 interface ToolCallRendererProps {
   toolCalls: ToolCall[];
@@ -32,9 +32,13 @@ export function ToolCallRenderer({
   return (
     <>
       {toolCalls.map((toolCall, index) => {
-        uiLog.debug(
-          `Rendering tool call: ${toolCall.tool_name}`,
-          toolCall.args,
+        uiLog.info(
+          `🛠️ ToolCallRenderer: Processing [${index}] ${toolCall.tool_name}`,
+          {
+            status: toolCall.status,
+            args: toolCall.args,
+            bankingStateStatus: bankingState?.status,
+          }
         );
 
         // Show loading state while executing
@@ -43,7 +47,8 @@ export function ToolCallRenderer({
             <View
               key={index}
               className="mx-4 my-2 items-center rounded-xl p-4"
-              style={{backgroundColor: 'rgba(255, 255, 255, 0.4)'}}>
+              style={{ backgroundColor: 'rgba(255, 255, 255, 0.4)' }}
+            >
               <ActivityIndicator size="small" color={colors.primary} />
               <Text className="mt-2 text-sm text-slate-500">
                 Processing {toolCall.tool_name}...

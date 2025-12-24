@@ -76,3 +76,14 @@ export interface ToolCall {
   args: Record<string, unknown>;
   status: 'executing' | 'complete';
 }
+
+/**
+ * Interface for the chat API response from the backend.
+ * Provides consistency for parsing message, tool calls and state updates.
+ */
+export interface ChatAPIResponse {
+  session_id?: string;
+  message: { content: string };
+  tool_calls?: ToolCall[];
+  state?: BankingState;
+}

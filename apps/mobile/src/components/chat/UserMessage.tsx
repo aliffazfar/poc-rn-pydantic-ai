@@ -28,7 +28,7 @@ export function UserMessage({ message }: UserMessageProps) {
         )}
         {message.content && (
           <View className="bg-primary rounded-2xl rounded-br-sm px-3.5 py-2.5 shadow-md elevation-4">
-            <Text className="text-white text-[15px] font-medium leading-relaxed">
+            <Text className="text-text-inverse text-[15px] font-medium leading-relaxed">
               {message.content}
             </Text>
           </View>

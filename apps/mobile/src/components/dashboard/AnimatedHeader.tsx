@@ -1,9 +1,9 @@
 import React from 'react';
-import {View, Text, TouchableOpacity, ViewStyle} from 'react-native';
-import Animated, {AnimatedStyle} from 'react-native-reanimated';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {Sparkles, X, Bell} from 'lucide-react-native';
-import {colors} from '../../themes/colors';
+import { View, Text, TouchableOpacity, ViewStyle } from 'react-native';
+import Animated, { AnimatedStyle } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Sparkles, X, Bell } from 'lucide-react-native';
+import { colors } from '../../themes/colors';
 import { GlassCircle, GlassButton } from '../common/GlassButton';
 
 interface AnimatedHeaderProps {
@@ -72,7 +72,7 @@ export function AnimatedHeader({
               backgroundOpacity={0.15}
               borderOpacity={0.25}
             >
-              <Text className="text-white text-xs font-extrabold">
+              <Text className="text-text-inverse text-xs font-extrabold">
                 {userInitials}
               </Text>
             </GlassCircle>
@@ -83,7 +83,7 @@ export function AnimatedHeader({
               activeOpacity={0.7}
               className="h-8 w-8 items-center justify-center"
             >
-              <X size={18} color="#FFFFFF" />
+              <X size={18} color={colors.textInverse} />
             </TouchableOpacity>
           </Animated.View>
         </View>
@@ -105,10 +105,10 @@ export function AnimatedHeader({
               <View className="flex-row items-center gap-2">
                 <Sparkles
                   size={12}
-                  color={colors.surface}
-                  fill={colors.surface}
+                  color={colors.textInverse}
+                  fill={colors.textInverse}
                 />
-                <Text className="text-white text-sm font-bold">
+                <Text className="text-text-inverse text-sm font-bold">
                   Ask JomKira AI
                 </Text>
               </View>
@@ -118,10 +118,14 @@ export function AnimatedHeader({
             style={[{ position: 'absolute' }, titleStyle]}
             className="flex-row items-center gap-1.5"
           >
-            <Sparkles size={14} color="#FFFFFF" />
-            <Text className="text-sm font-bold text-white">JomKira AI</Text>
+            <Sparkles size={14} color={colors.textInverse} />
+            <Text className="text-text-inverse text-sm font-bold">
+              JomKira AI
+            </Text>
             <View className="rounded border border-white/30 px-1.5 py-0.5">
-              <Text className="text-[10px] text-white/70">beta</Text>
+              <Text className="text-text-inverse text-[10px] opacity-70">
+                beta
+              </Text>
             </View>
           </Animated.View>
         </View>
@@ -142,7 +146,7 @@ export function AnimatedHeader({
               backgroundOpacity={0.15}
               borderOpacity={0.25}
             >
-              <Bell size={18} color={colors.surface} />
+              <Bell size={18} color={colors.textInverse} />
               <View className="absolute top-0 right-0 h-2 w-2 rounded-full border border-white bg-error" />
             </GlassCircle>
           </Animated.View>

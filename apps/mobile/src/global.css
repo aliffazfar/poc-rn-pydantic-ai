@@ -1,5 +1,5 @@
-@import "tailwindcss";
-@import "uniwind";
+@import 'tailwindcss';
+@import 'uniwind';
 
 /* Custom theme variables using Tailwind 4 CSS syntax */
 @theme {
@@ -17,9 +17,13 @@
   /* Surface Colors */
   --color-background: #f8fafc;
   --color-surface: #ffffff;
+  --color-glass-bg: rgba(25, 30, 55, 0.85);
+  --color-glass-border: rgba(255, 255, 255, 0.12);
+  --color-glass-card: rgba(41, 41, 64, 0.4);
 
   /* Text Colors */
   --color-text-primary: #0f172a;
+  --color-text-inverse: #ffffff;
   --color-text-secondary: #64748b;
   --color-text-muted: #94a3b8;
 

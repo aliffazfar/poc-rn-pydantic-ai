@@ -1,15 +1,9 @@
 import React from 'react';
-import {View, Text, TouchableOpacity} from 'react-native';
-import {
-  Zap,
-  Building2,
-  Droplet,
-  Wifi,
-  CreditCard,
-} from 'lucide-react-native';
-import {CURRENCY} from '../../lib/constants';
-import {colors} from '../../themes/colors';
-import {uiLog} from '../../lib/logger';
+import { View, Text, TouchableOpacity } from 'react-native';
+import { Zap, Building2, Droplet, Wifi, CreditCard } from 'lucide-react-native';
+import { CURRENCY } from '../../lib/constants';
+import { colors } from '../../themes/colors';
+import { uiLog } from '../../lib/logger';
 import { GlassPill } from '../common/GlassButton';
 
 type PaymentType = 'transfer' | 'bill';
@@ -186,6 +180,13 @@ export function InChatPaymentCard({
 
   const config = getDisplayConfig();
 
+  uiLog.info(`💳 InChatPaymentCard: Rendering [${type}]`, {
+    amount,
+    recipient: recipientName,
+    biller: billerName,
+    configHeader: config.headerText,
+  });
+
   const handleApprove = () => {
     uiLog.info(`${type} approved`, { amount });
     onApprove();
@@ -201,27 +202,14 @@ export function InChatPaymentCard({
     onEdit();
   };
 
-  // Dark theme colors matching AssistantMessage and Ryt app
-  const DARK_CARD_BG = 'rgba(41, 41, 64, 0.4)'; // Matches AssistantMessage bg-[#292940]/40
-  const DARK_CARD_BORDER = 'rgba(255, 255, 255, 0.12)';
-  const RECIPIENT_BOX_BORDER = 'rgba(255, 255, 255, 0.12)';
-
   return (
     <View className="my-2 space-y-3">
-      {/* Payment Card with dark glassmorphism matching Ryt app */}
-      <View
-        className="w-full max-w-[90%] overflow-hidden rounded-2xl p-1"
-        style={{
-          backgroundColor: DARK_CARD_BG,
-          borderWidth: 1,
-          borderColor: DARK_CARD_BORDER,
-        }}
-      >
+      <View className="bg-glass-card border-glass-border w-full max-w-[90%] overflow-hidden rounded-2xl border p-1">
         {/* Card Content */}
         <View className="px-4 py-3">
           {/* Header */}
           <View className="mb-3 flex-row items-center gap-1">
-            <Text className="text-[9px] font-extrabold tracking-widest text-white/50">
+            <Text className="text-text-inverse/50 text-[9px] font-extrabold tracking-widest">
               {config.headerText}
             </Text>
             <View
@@ -236,25 +224,18 @@ export function InChatPaymentCard({
 
           {/* Amount - white text on dark background */}
           <View className="mb-1">
-            <Text className="text-3xl font-extrabold tracking-tighter text-white">
+            <Text className="text-text-inverse text-3xl font-extrabold tracking-tighter">
               {CURRENCY} {amount.toFixed(2)}
             </Text>
           </View>
 
           {/* Reference / Due Date Info */}
-          <Text className="mb-4 text-[10px] font-semibold text-white/50">
+          <Text className="text-text-inverse/50 mb-4 text-[10px] font-semibold">
             {config.referenceText}
           </Text>
 
           {/* Recipient / Biller - dark glassmorphic box */}
-          <View
-            className="mx-0 flex-row items-center gap-2.5 rounded-xl p-2.5"
-            style={{
-              backgroundColor: 'transparent',
-              borderWidth: 1,
-              borderColor: RECIPIENT_BOX_BORDER,
-            }}
-          >
+          <View className="border-glass-border mx-0 flex-row items-center gap-2.5 rounded-xl border p-2.5">
             {/* Avatar */}
             <View
               className="h-9 w-9 items-center justify-center rounded-full"
@@ -277,12 +258,12 @@ export function InChatPaymentCard({
             {/* Name and Account - white text for dark theme */}
             <View className="flex-1 overflow-hidden">
               <Text
-                className="text-xs font-extrabold text-white"
+                className="text-text-inverse text-xs font-extrabold"
                 numberOfLines={1}
               >
                 {(config.displayName || 'Unknown').toUpperCase()}
               </Text>
-              <Text className="text-[10px] font-semibold text-white/50">
+              <Text className="text-text-inverse/50 text-[10px] font-semibold">
                 {config.displayAccount || 'N/A'}
                 {config.isTransfer &&
                   config.displaySubtitle &&
@@ -323,7 +304,7 @@ export function InChatPaymentCard({
             backgroundOpacity={0}
             rainbowBorder={true}
           >
-            <Text className="text-[13px] font-bold text-white">
+            <Text className="text-text-inverse text-[13px] font-bold">
               {config.approveText}
             </Text>
           </GlassPill>
