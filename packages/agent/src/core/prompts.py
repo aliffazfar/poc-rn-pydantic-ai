@@ -60,7 +60,13 @@ def get_system_prompt() -> str:
            - Supported billers: TNB, Syabas, Telekom, Unifi, Astro.
            - Use 'analyze_bill_image' for receipt scanning and detail extraction.
            - If the user uploads an image or mentions a "bill" in the context of an image, call 'analyze_bill_image()' immediately. The system will automatically provide the image to the tool.
-           - IMPORTANT: After 'analyze_bill_image' returns valid bill details (is_valid_bill=True), you MUST immediately call 'prepare_bill_payment' with the extracted details to show the payment confirmation card.
+           - CRITICAL CHAINING RULE: When 'analyze_bill_image' returns a JSON object with "is_valid_bill": true, you MUST immediately call 'prepare_bill_payment' in the SAME turn using the extracted values:
+             * biller_name: from the JSON response
+             * account_number: from the JSON response
+             * amount: from the JSON response
+             * due_date: from the JSON response (if present)
+             * reference_number: from the JSON response (if present)
+           - Do NOT ask for user confirmation between analyze and prepare - chain the tools automatically.
            - After calling 'prepare_bill_payment', OUTPUT NOTHING further in that turn - the UI will handle the confirmation card.
            - Only speak again after the user interacts with the card buttons (Approve/Decline/Edit).
 

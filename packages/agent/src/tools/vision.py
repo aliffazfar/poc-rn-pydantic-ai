@@ -131,24 +131,18 @@ async def analyze_bill_image(
             logger.info(f"   └─ Vision analysis complete: is_valid_bill={bill.is_valid_bill}")
             
             if bill.is_valid_bill:
-                # Format a nice response
-                response_parts = ["Successfully analyzed the bill image. Extracted details:"]
+                # Log the extracted details
+                logger.info(f"   └─ Extracted bill details:")
+                logger.info(f"      ├─ Biller: {bill.biller_name}")
+                logger.info(f"      ├─ Amount: RM {bill.amount:.2f}" if bill.amount else "      ├─ Amount: None")
+                logger.info(f"      ├─ Account: {bill.account_number}")
+                logger.info(f"      ├─ Due Date: {bill.due_date}")
+                logger.info(f"      └─ Reference: {bill.reference_number}")
                 
-                if bill.biller_name:
-                    response_parts.append(f"- Biller: {bill.biller_name}")
-                if bill.amount is not None:
-                    response_parts.append(f"- Amount: RM {bill.amount:.2f}")
-                if bill.account_number:
-                    response_parts.append(f"- Account: {bill.account_number}")
-                if bill.due_date:
-                    response_parts.append(f"- Due Date: {bill.due_date}")
-                if bill.reference_number:
-                    response_parts.append(f"- Reference: {bill.reference_number}")
-                
-                response_parts.append("")
-                response_parts.append("Would you like me to prepare this payment for you?")
-                
-                return "\n".join(response_parts)
+                # Return raw JSON to the agent so it can chain the next tool call
+                # as instructed in the system prompt (auto-call prepare_bill_payment).
+                logger.info(f"   └─ Returning JSON for agent to chain prepare_bill_payment")
+                return json.dumps(bill.model_dump())
             else:
                 return f"I couldn't extract bill details from this image. {bill.error_message or 'Please upload a clearer image of your bill.'}"
                 
