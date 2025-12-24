@@ -67,6 +67,8 @@ export interface ChatMessage {
     format: string;
     bytes: string;
   };
+  toolCalls?: ToolCall[];
+  bankingState?: BankingState;
 }
 
 export interface ToolCall {

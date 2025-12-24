@@ -4,7 +4,7 @@
  */
 export const colors = {
   // Brand Colors
-  primary: '#3B82F6',
+  primary: '#336eff',
   primaryLight: '#DBEAFE',
   primaryDark: '#1D4ED8',
 
@@ -39,10 +39,18 @@ export const colors = {
     900: '#0F172A',
   },
 
-  // Gradient Colors
+  // Gradient Colors (legacy - for light mode)
   gradientStart: '#E0F2FE', // sky-100
   gradientMid: '#F3E8FF', // purple-100
   gradientEnd: '#F1F5F9', // slate-100
+
+  // Mesh Gradient Colors (for dark mode AI chat background)
+  meshGradient: {
+    cyan: '#00D2FF', // Top Left - Bright Cyan/Turquoise
+    azure: '#3A7BD5', // Center/Top - Medium Azure
+    violet: '#7022B4', // Right Side - Deep Violet/Magenta
+    navy: '#09091A', // Bottom - Rich Dark Navy
+  },
 
   // Border Colors
   border: '#E2E8F0',

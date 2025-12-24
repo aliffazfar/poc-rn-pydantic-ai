@@ -4,8 +4,8 @@
 /* Custom theme variables using Tailwind 4 CSS syntax */
 @theme {
   /* Brand Colors */
-  --color-primary: #3b82f6;
-  --color-primary-light: #dbeafe;
+  --color-primary: #336eff;
+  --color-primary-light: #ebf3ff;
   --color-primary-dark: #1d4ed8;
 
   /* Status Colors */
