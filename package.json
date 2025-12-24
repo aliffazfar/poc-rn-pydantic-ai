@@ -1,14 +1,20 @@
 {
   "name": "poc-rn-pydantic-ai",
   "private": true,
+  "workspaces": [
+    "apps/mobile"
+  ],
   "scripts": {
-    "dev": "concurrently -n agent,metro -c blue,green \"pnpm run dev:agent\" \"pnpm run dev:mobile\"",
+    "dev": "concurrently -n agent,metro -c blue,green \"yarn dev:agent\" \"yarn dev:mobile\"",
     "dev:agent": "cd packages/agent && source .venv/bin/activate && cd src && uvicorn main:app --reload --host 0.0.0.0 --port 8000",
-    "dev:mobile": "cd apps/mobile && pnpm start",
-    "setup": "pnpm install && pnpm setup:agent",
+    "dev:mobile": "cd apps/mobile && yarn start",
+    "setup": "yarn install && yarn setup:agent",
     "setup:agent": "cd packages/agent && uv venv && source .venv/bin/activate && uv sync",
-    "ios": "cd apps/mobile && pnpm ios",
-    "android": "cd apps/mobile && pnpm android"
+    "ios": "cd apps/mobile && yarn ios",
+    "ios:pods:clean": "rm -rf apps/mobile/ios/Pods apps/mobile/ios/Podfile.lock",
+    "ios:pods:install": "cd apps/mobile/ios && pod install",
+    "ios:pods:reset": "rm -rf apps/mobile/ios/Pods apps/mobile/ios/Podfile.lock && cd apps/mobile/ios && pod install",
+    "android": "cd apps/mobile && yarn android"
   },
   "devDependencies": {
     "concurrently": "^8.2.0"
