@@ -1,10 +1,16 @@
 from pydantic import BaseModel
 from typing import Optional, List
 
+class ChatImage(BaseModel):
+    """Image data format."""
+    format: str
+    bytes: str
+
 class ChatMessage(BaseModel):
     """Message format compatible with Vercel AI SDK."""
     role: str  # user, assistant, system
     content: str
+    image: Optional[ChatImage] = None
 
 class ChatRequest(BaseModel):
     """Request format from react-native-vercel-ai."""

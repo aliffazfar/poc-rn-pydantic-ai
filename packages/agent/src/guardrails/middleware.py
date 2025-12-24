@@ -27,6 +27,9 @@ class GuardrailMiddleware:
         if scope["type"] != "http" or scope["method"] != "POST":
             return await self.app(scope, receive, send)
         
+        path = scope.get("path", "")
+        is_agui_path = path.startswith("/agui")
+        
         body, messages = await self._buffer_request(receive)
         
         # Parse body once
@@ -81,7 +84,8 @@ class GuardrailMiddleware:
                 
                 # Remove custom _image field from messages to avoid Pydantic validation error
                 # (PydanticAI's AG-UI schema uses extra='forbid')
-                modified_body = self._strip_image_fields(body_json)
+                if is_agui_path:
+                    modified_body = self._strip_image_fields(body_json)
             else:
                 logger.info("⚠️ extract_last_user_image returned None")
         

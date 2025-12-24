@@ -1,10 +1,12 @@
 import logging
 import json
 from uuid import uuid4
+import base64
 from fastapi import FastAPI, Request, Header
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from typing import Optional
+from typing import Optional, List, Union
+from pydantic_ai import BinaryContent
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
@@ -17,6 +19,7 @@ from models.chat import ChatRequest, ChatResponse, ChatMessage, ToolCallResult
 from config.settings import settings
 from config.logging import setup_logging
 from guardrails.middleware import GuardrailMiddleware
+from core.context import current_image_ctx, ImageData
 
 # 1. Setup Logging
 setup_logging()
@@ -116,14 +119,47 @@ async def vercel_ai_chat(
             session_id=session_id
         )
 
-    # Extract user message
-    user_input = ""
+    # Extract user message and image
+    user_input: List[Union[str, BinaryContent]] = []
+    
+    # Process history for PydanticAI (simplification: only use last message for multimodal if image present)
+    # Most agents expect the current user message to contain the image
     if request.messages:
-        user_input = request.messages[-1].content
-        logger.debug(f"   └─ User: {user_input[:50]}...")
+        last_msg = request.messages[-1]
+        
+        # Add text content
+        if last_msg.content:
+            user_input.append(last_msg.content)
+        elif last_msg.image:
+            # If only image is provided, add a prompt to trigger vision analysis
+            user_input.append("I've uploaded an image. Please analyze it.")
+        
+        # Add image content if present
+        if last_msg.image:
+            logger.info(f"   🖼️  Processing image from request: {last_msg.image.format}")
+            try:
+                # Note: context is already set by GuardrailMiddleware, but we ensure it here too
+                # just in case middleware extraction logic differs.
+                current_image_ctx.set(ImageData(
+                    bytes=last_msg.image.bytes,
+                    format=last_msg.image.format
+                ))
+                
+                img_bytes = base64.b64decode(last_msg.image.bytes)
+                # Ensure we use valid MIME types for vision models
+                fmt = last_msg.image.format.lower()
+                if fmt == 'jpg': fmt = 'jpeg'
+                mime_type = f"image/{fmt}"
+                
+                user_input.append(BinaryContent(data=img_bytes, media_type=mime_type))
+            except Exception as e:
+                logger.error(f"   ❌ Failed to decode image: {e}")
 
     # Run the SAME agent used by CopilotKit
-    result = await agent.run(user_input, deps=StateDeps(state))
+    # Note: PydanticAI supports multimodal inputs in agent.run()
+    # Fallback to empty string if no input
+    prompt = user_input if user_input else ""
+    result = await agent.run(prompt, deps=StateDeps(state))
 
     # Extract tool calls for Generative UI
     tool_calls = extract_tool_calls(result)
