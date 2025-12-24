@@ -203,6 +203,9 @@ export function ChatInput({
             />
           </TouchableOpacity>
         </View>
+        <Text className="mt-3 text-center text-xs text-white/40">
+          100% Malaysian made 🇲🇾 by aliffazfar
+        </Text>
       </View>
     </Animated.View>
   );

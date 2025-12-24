@@ -103,16 +103,6 @@ export function useJomKiraChat({
   }
 
   async function initSession() {
-    // Immediately show AI greeting if it's the first initialization
-    if (!sessionId && messages.length === 0) {
-      const greeting: ChatMessage = {
-        id: 'greeting',
-        role: 'assistant',
-        content: AI_GREETING,
-      };
-      setMessages([greeting]);
-    }
-
     try {
       const response = await fetch(`${API_BASE_URL}/api/chat`, {
         method: 'POST',

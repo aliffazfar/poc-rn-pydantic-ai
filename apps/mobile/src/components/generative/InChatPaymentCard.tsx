@@ -295,7 +295,6 @@ export function InChatPaymentCard({
             </TouchableOpacity>
           </View>
 
-          {/* Approve button - matching the glassy Ryt design with rainbow border */}
           <GlassPill
             width={100}
             height={36}

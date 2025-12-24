@@ -1,17 +1,17 @@
-import React, {useRef, forwardRef} from 'react';
-import {View, ScrollViewProps} from 'react-native';
-import {FlashList, FlashListRef} from '@shopify/flash-list';
+import React, { useRef, forwardRef } from 'react';
+import { View, ScrollViewProps } from 'react-native';
+import { FlashList, FlashListRef } from '@shopify/flash-list';
 import {
   KeyboardStickyView,
   KeyboardAwareScrollView,
   useReanimatedKeyboardAnimation,
 } from 'react-native-keyboard-controller';
-import { useAnimatedStyle } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import {BankingState, ChatMessage, ToolCall} from '../../lib/types';
-import {UserMessage} from './UserMessage';
-import {AssistantMessage} from './AssistantMessage';
+import { BankingState, ChatMessage, ToolCall } from '../../lib/types';
+import { UserMessage } from './UserMessage';
+import { AssistantMessage } from './AssistantMessage';
 import { ChatInput } from './ChatInput';
+import { ChatShortcuts } from './ChatShortcuts';
 
 interface ChatScreenProps {
   messages: ChatMessage[];
@@ -46,13 +46,6 @@ export function ChatScreen({
   const insets = useSafeAreaInsets();
   const { progress } = useReanimatedKeyboardAnimation();
 
-  // Animate opacity and blur for dark glass background: invisible when closed, visible when keyboard open
-  const animatedBackgroundStyle = useAnimatedStyle(() => {
-    return {
-      opacity: progress.value,
-    };
-  });
-
   const renderMessage = ({ item }: { item: ChatMessage }) => {
     if (item.role === 'user') {
       return <UserMessage message={item} />;
@@ -78,29 +71,48 @@ export function ChatScreen({
     flashListRef.current?.scrollToEnd({ animated: true });
   };
 
+  // Check if we should show empty state (shortcuts)
+  const isEmpty = messages.length === 0;
+
   return (
-    <View className="flex-1 ">
-      {/* Chat messages list with KeyboardAwareScrollView integration */}
-      <FlashList
-        ref={flashListRef}
-        data={messages}
-        renderItem={renderMessage}
-        renderScrollComponent={RenderScrollComponent}
-        keyExtractor={(item: ChatMessage) => item.id}
-        contentContainerStyle={{
-          padding: 16,
-          paddingBottom: insets.bottom + bottomOffset + 200, // Extra space for input + promo banner + sheet
-        }}
-        onContentSizeChange={scrollToEnd}
-        keyboardDismissMode="interactive"
-        keyboardShouldPersistTaps="handled"
-        ListFooterComponent={
-          <>
-            {isLoading && <AssistantMessage isLoading />}
-            {toolCalls.length > 0 && renderToolCalls?.()}
-          </>
-        }
-      />
+    <View className="flex-1">
+      {/* Show ChatShortcuts when no messages - renders OUTSIDE FlashList for proper centering */}
+      {isEmpty ? (
+        <KeyboardAwareScrollView
+          contentContainerStyle={{
+            flexGrow: 1,
+            justifyContent: 'center',
+            paddingBottom: 250, // Account for sticky input overlay
+          }}
+          keyboardShouldPersistTaps="handled"
+        >
+          <ChatShortcuts
+            onShortcutPress={(id, label) => onSendMessage(label)}
+          />
+        </KeyboardAwareScrollView>
+      ) : (
+        /* Chat messages list with KeyboardAwareScrollView integration */
+        <FlashList
+          ref={flashListRef}
+          data={messages}
+          renderItem={renderMessage}
+          renderScrollComponent={RenderScrollComponent}
+          keyExtractor={(item: ChatMessage) => item.id}
+          contentContainerStyle={{
+            padding: 16,
+            paddingBottom: insets.bottom + bottomOffset + 200, // Extra space for input + promo banner + sheet
+          }}
+          onContentSizeChange={scrollToEnd}
+          keyboardDismissMode="interactive"
+          keyboardShouldPersistTaps="handled"
+          ListFooterComponent={
+            <>
+              {isLoading && <AssistantMessage isLoading />}
+              {toolCalls.length > 0 && renderToolCalls?.()}
+            </>
+          }
+        />
+      )}
 
       {/* Sticky input that follows keyboard - positioned absolutely at bottom */}
       <KeyboardStickyView

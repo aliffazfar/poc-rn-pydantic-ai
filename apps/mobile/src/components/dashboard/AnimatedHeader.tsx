@@ -72,7 +72,7 @@ export function AnimatedHeader({
               backgroundOpacity={0.15}
               borderOpacity={0.25}
             >
-              <Text className="text-text-inverse text-xs font-extrabold">
+              <Text className="text-text-inverse text-xs font-bold">
                 {userInitials}
               </Text>
             </GlassCircle>
@@ -108,7 +108,7 @@ export function AnimatedHeader({
                   color={colors.textInverse}
                   fill={colors.textInverse}
                 />
-                <Text className="text-text-inverse text-sm font-bold">
+                <Text className="text-text-inverse text-sm font-semibold">
                   Ask JomKira AI
                 </Text>
               </View>
