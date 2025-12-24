@@ -1,11 +1,7 @@
-import {useState} from 'react';
-import {
-  ChatMessage,
-  ToolCall,
-  BankingState,
-} from '../lib/types';
-import {API_BASE_URL} from '../lib/constants';
-import {logger} from '../lib/logger';
+import { useState } from 'react';
+import { ChatMessage, ToolCall, BankingState } from '../lib/types';
+import { API_BASE_URL } from '../lib/constants';
+import { logger } from '../lib/logger';
 
 interface UseJomKiraChatOptions {
   initialBalance?: number;
@@ -28,7 +24,10 @@ export function useJomKiraChat({
     status: 'idle',
   });
 
-  async function sendMessage(text: string, image?: {format: string; bytes: string}) {
+  async function sendMessage(
+    text: string,
+    image?: { format: string; bytes: string }
+  ) {
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
       role: 'user',
@@ -36,7 +35,7 @@ export function useJomKiraChat({
       image,
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    setMessages((prev) => [...prev, userMessage]);
     setIsLoading(true);
 
     try {
@@ -45,14 +44,15 @@ export function useJomKiraChat({
         headers: {
           'Content-Type': 'application/json',
           'X-Platform': 'react-native',
-          ...(sessionId && {'X-Session-Id': sessionId}),
+          ...(sessionId && { 'X-Session-Id': sessionId }),
         },
         body: JSON.stringify({
-          messages: [...messages, userMessage].map(m => ({
+          messages: [...messages, userMessage].map((m) => ({
             role: m.role,
             content: m.content,
+            image: m.image,
           })),
-          ...(sessionId ? {} : {initial_balance: bankingState.balance}),
+          ...(sessionId ? {} : { initial_balance: bankingState.balance }),
         }),
       });
 
@@ -75,7 +75,7 @@ export function useJomKiraChat({
         toolCalls: data.tool_calls,
         bankingState: data.state,
       };
-      setMessages(prev => [...prev, assistantMessage]);
+      setMessages((prev) => [...prev, assistantMessage]);
 
       // Clear global tool calls since they are now attached to the message in history
       setToolCalls([]);
@@ -99,7 +99,8 @@ export function useJomKiraChat({
       const greeting: ChatMessage = {
         id: 'greeting',
         role: 'assistant',
-        content: "Hello! I'm JomKira AI. How can I assist you today? I can help you with bank transfers, bill payments, or balance inquiries.",
+        content:
+          "Hello! I'm JomKira AI. How can I assist you today? I can help you with bank transfers, bill payments, or balance inquiries.",
       };
       setMessages([greeting]);
     }
@@ -110,7 +111,7 @@ export function useJomKiraChat({
         headers: {
           'Content-Type': 'application/json',
           'X-Platform': 'react-native',
-          ...(sessionId && {'X-Session-Id': sessionId}),
+          ...(sessionId && { 'X-Session-Id': sessionId }),
         },
         body: JSON.stringify({
           messages: [],
@@ -126,7 +127,9 @@ export function useJomKiraChat({
       const data = await response.json();
       if (data.session_id) {
         setSessionId(data.session_id);
-        logger.info('🆕 Session initialized silently', {sessionId: data.session_id});
+        logger.info('🆕 Session initialized silently', {
+          sessionId: data.session_id,
+        });
       }
     } catch (error) {
       const err = error instanceof Error ? error : new Error('Unknown error');
