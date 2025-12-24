@@ -119,10 +119,7 @@ export function ChatInput({
         style={[promoBannerStyle, { overflow: 'hidden' }]}
         className="bg-glass-bg border-glass-border flex-row items-center gap-3 rounded-xl border px-3"
       >
-        <View
-          className="h-6 w-6 items-center justify-center rounded-full"
-          style={{ backgroundColor: 'rgba(59, 130, 246, 0.3)' }}
-        >
+        <View className="h-6 w-6 items-center justify-center rounded-full border border-white">
           <Wallet size={14} color={colors.textInverse} />
         </View>
         <View className="flex-1">
@@ -203,7 +200,7 @@ export function ChatInput({
             />
           </TouchableOpacity>
         </View>
-        <Text className="mt-3 text-center text-xs text-white/40">
+        <Text className="mt-3 text-center text-xs text-white/60">
           100% Malaysian made 🇲🇾 by aliffazfar
         </Text>
       </View>

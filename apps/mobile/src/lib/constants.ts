@@ -36,3 +36,17 @@ export const PROMO_BANNER = {
 // AI Assistant Configuration
 export const AI_GREETING =
   "Hello! I'm JomKira AI. How can I assist you today? I can help you with bank transfers, bill payments, or balance inquiries.";
+
+/**
+ * Formats a number as Malaysian Ringgit currency with thousand separators.
+ * @param amount - The amount to format
+ * @param showCurrency - Whether to prepend CURRENCY symbol (default: false)
+ * @returns Formatted string like "1,108.82" or "RM 1,108.82"
+ */
+export function formatAmount(amount: number, showCurrency = false): string {
+  const formatted = amount.toLocaleString('en-MY', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+  return showCurrency ? `${CURRENCY} ${formatted}` : formatted;
+}

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { Zap, Building2, Droplet, Wifi, CreditCard } from 'lucide-react-native';
-import { CURRENCY } from '../../lib/constants';
+import { CURRENCY, formatAmount } from '../../lib/constants';
 import { colors } from '../../themes/colors';
 import { uiLog } from '../../lib/logger';
 import { GlassPill } from '../common/GlassButton';
@@ -203,7 +203,7 @@ export function InChatPaymentCard({
   };
 
   return (
-    <View className="my-2 space-y-3">
+    <View className="mt-0 mb-2 space-y-3">
       <View className="bg-glass-card border-glass-border w-full max-w-[90%] overflow-hidden rounded-2xl border p-1">
         {/* Card Content */}
         <View className="px-4 py-3">
@@ -225,7 +225,7 @@ export function InChatPaymentCard({
           {/* Amount - white text on dark background */}
           <View className="mb-1">
             <Text className="text-text-inverse text-3xl font-extrabold tracking-tighter">
-              {CURRENCY} {amount.toFixed(2)}
+              {CURRENCY} {formatAmount(amount)}
             </Text>
           </View>
 
